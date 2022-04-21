@@ -3,7 +3,7 @@ import csv
 import requests
 from lxml import etree
 import time
-import re
+from tqdm import tqdm
 
 list_music = []
 # 请求头
@@ -13,13 +13,14 @@ headers = {
 f = open(r"C:\Users\tanzhijingg\Desktop\test2.csv", "w+", newline='', encoding="gb18030")
 writer = csv.writer(f, dialect='excel')
 # csv文件中第一行写入标题
-writer.writerow(["name", "mark", "coment", "quote", "time"])
+writer.writerow(["name", "time", "mark", "coment", "quote"])
 
 
 # 定义爬取内容的函数
 def music_info(url):
     html = requests.get(url, headers=headers)
     selector = etree.HTML(html.text)
+
     infos = selector.xpath('//div[@class="item"]')
     for info in infos:
         name = info.xpath('div[2]/div[1]/a/span[1]/text()')[0].strip()
@@ -33,7 +34,7 @@ def music_info(url):
         except:
             quote = ""
 
-        list_info = [name, mark, coment, quote, time1]
+        list_info = [name, time1, mark, coment, quote]
         writer.writerow([name, mark, coment, quote, time1])
         list_music.append(list_info)
 
@@ -44,18 +45,29 @@ def music_info(url):
 if __name__ == '__main__':
     urls = ['https://movie.douban.com/top250?start={}'.format(str(i)) for i in range(0, 250, 25)]
     # 调用函数music_info循环爬取内容
-    for url in urls:
+    for url in tqdm(urls):
         music_info(url)
     # 关闭csv文件
     f.close()
     # 爬取的内容保存在xls文件中
-    header = ["name", "mark", "coment", "quote", "time"]
+    header = ["name", "time", "mark", "coment", "quote", ]
+
+    font = xlwt.Font()
+    font.bold = True
+
+    alignment = xlwt.Alignment()
+    alignment.horz = 0x02
+
+    style = xlwt.XFStyle()
+    style.font = font
+    style.alignment = alignment
+
     # 打开工作簿
     book = xlwt.Workbook(encoding='utf-8')
     # 建立Sheet1工作表
     sheet = book.add_sheet('Sheet1')
     for h in range(len(header)):
-        sheet.write(0, h, header[h])
+        sheet.write(0, h, header[h], style)
     i = 1
     for list in list_music:
         j = 0
@@ -63,5 +75,12 @@ if __name__ == '__main__':
             sheet.write(i, j, data)
             j += 1
         i += 1
+
+    sheet.col(0).width = 256 * 30
+    sheet.col(1).width = 256 * 10
+    sheet.col(2).width = 256 * 10
+    sheet.col(3).width = 256 * 15
+    sheet.col(4).width = 256 * 60
+
     # 保存文件
     book.save('doubanmovie.xls')
