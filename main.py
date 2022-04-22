@@ -12,7 +12,7 @@ list_movie = []
 headers = {'User-Agent': str(UserAgent().random)}
 
 # 爬取的内容保存在csv文件中
-f = open(r"C:\Users\tanzhijingg\Desktop\test2.csv", "w+", newline='', encoding="gb18030")
+f = open(r"C:\Users\tanzhijingg\Desktop\douban_movie.csv", "w+", newline='', encoding="gb18030")
 writer = csv.writer(f, dialect='excel')
 # csv文件中第一行写入标题
 writer.writerow(["name", "year", "mark", "comment", "quote"])
@@ -88,4 +88,4 @@ if __name__ == '__main__':
     sheet.col(4).width = 256 * 60
 
     # 保存文件
-    book.save('doubanmovie.xls')
+    book.save('douban_movie.xls')
