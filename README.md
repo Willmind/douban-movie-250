@@ -1,5 +1,10 @@
 ### 4.22
-添加随机ua，使用fake-useragent库，构造随机ua
+webstorm 自带local history,切换分支忘记提交代码也可以代码历史记录回溯  
+添加随机ua，使用fake-useragent库，构造随机ua   
+添加requirements.txt配置文件Python一键安装所有依赖  
+在新的工作空间一键安装
+
+    pip install -r requirements.txt
 
 
 ### 4.20～21学习爬虫记录
