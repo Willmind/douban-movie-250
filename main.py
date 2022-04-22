@@ -55,9 +55,11 @@ if __name__ == '__main__':
     # 爬取的内容保存在xls文件中
     header = ["name", "year", "mark", "comment", "quote", ]
 
+    #设置列头加粗
     font = xlwt.Font()
     font.bold = True
 
+    #设置列头单元格居中
     alignment = xlwt.Alignment()
     alignment.horz = 0x02
 
@@ -78,7 +80,7 @@ if __name__ == '__main__':
             sheet.write(i, j, data)
             j += 1
         i += 1
-
+    #设置单元格宽度
     sheet.col(0).width = 256 * 30
     sheet.col(1).width = 256 * 10
     sheet.col(2).width = 256 * 10
