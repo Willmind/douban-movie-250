@@ -7,12 +7,14 @@ from tqdm import tqdm
 # 加随机ua，使用fake-useragent库，构造随机ua
 from fake_useragent import UserAgent
 
+import json
+
 list_movie = []
 # 请求头
 headers = {'User-Agent': str(UserAgent().random)}
 
 # 爬取的内容保存在csv文件中
-f = open(r"C:\Users\tanzhijingg\Desktop\douban_movie.csv", "w+", newline='', encoding="gb18030")
+f = open(r"douban_movie.csv", "w+", newline='', encoding="gb18030")
 writer = csv.writer(f, dialect='excel')
 # csv文件中第一行写入标题
 writer.writerow(["name", "year", "mark", "comment", "quote"])
@@ -55,11 +57,11 @@ if __name__ == '__main__':
     # 爬取的内容保存在xls文件中
     header = ["name", "year", "mark", "comment", "quote", ]
 
-    #设置列头加粗
+    # 设置列头加粗
     font = xlwt.Font()
     font.bold = True
 
-    #设置列头单元格居中
+    # 设置列头单元格居中
     alignment = xlwt.Alignment()
     alignment.horz = 0x02
 
@@ -80,7 +82,7 @@ if __name__ == '__main__':
             sheet.write(i, j, data)
             j += 1
         i += 1
-    #设置单元格宽度
+    # 设置单元格宽度
     sheet.col(0).width = 256 * 30
     sheet.col(1).width = 256 * 10
     sheet.col(2).width = 256 * 10
@@ -89,3 +91,17 @@ if __name__ == '__main__':
 
     # 保存文件
     book.save('douban_movie.xls')
+
+    f = open("douban_movie.csv", "r", encoding='gbk')  #
+    ls = []
+    for line in f:
+        line = line.replace("\n", "")
+        ls.append(line.split(","))
+
+    f.close()
+    fw = open("douban_movie.json", "w", encoding='utf-8')
+    for i in range(1, len(ls)):
+        ls[i] = dict(zip(ls[0], ls[i]))
+    a = json.dumps(ls[1:], sort_keys=True, indent=4, ensure_ascii=False)
+    fw.write(a)
+    fw.close()
