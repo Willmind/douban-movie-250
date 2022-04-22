@@ -4,16 +4,18 @@ import requests
 from lxml import etree
 import time
 from tqdm import tqdm
+# 加随机ua，使用fake-useragent库，构造随机ua
+from fake_useragent import UserAgent
 
-list_music = []
+list_movie = []
 # 请求头
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36"}
+headers = {'User-Agent': str(UserAgent().random)}
+
 # 爬取的内容保存在csv文件中
 f = open(r"C:\Users\tanzhijingg\Desktop\test2.csv", "w+", newline='', encoding="gb18030")
 writer = csv.writer(f, dialect='excel')
 # csv文件中第一行写入标题
-writer.writerow(["name", "time", "mark", "coment", "quote"])
+writer.writerow(["name", "year", "mark", "comment", "quote"])
 
 
 # 定义爬取内容的函数
@@ -21,22 +23,23 @@ def music_info(url):
     html = requests.get(url, headers=headers)
     selector = etree.HTML(html.text)
 
-    infos = selector.xpath('//div[@class="item"]')
-    for info in infos:
+    infomation = selector.xpath('//div[@class="item"]')
+    for info in infomation:
         name = info.xpath('div[2]/div[1]/a/span[1]/text()')[0].strip()
-        time1 = int(info.xpath('div[2]/div[2]/p[1]/text()')[1].strip()[0:4])
+        year = int(info.xpath('div[2]/div[2]/p[1]/text()')[1].strip()[0:4])
 
         mark = float(info.xpath('div[2]/div[2]/div/span[2]/text()')[0].strip())
-        coment = int(
+        comment = int(
             info.xpath('div[2]/div[2]/div/span[4]/text()')[0].strip().strip("(").strip(")").replace('人评价', '').strip())
+        # noinspection PyBroadException
         try:
             quote = info.xpath('div[2]/div[2]/p[@class="quote"]/span/text()')[0].strip()
         except:
             quote = ""
 
-        list_info = [name, time1, mark, coment, quote]
-        writer.writerow([name, mark, coment, quote, time1])
-        list_music.append(list_info)
+        list_info = [name, year, mark, comment, quote]
+        writer.writerow([name, year, mark, comment, quote])
+        list_movie.append(list_info)
 
     # 防止请求频繁，故睡眠1秒
     time.sleep(1)
@@ -50,7 +53,7 @@ if __name__ == '__main__':
     # 关闭csv文件
     f.close()
     # 爬取的内容保存在xls文件中
-    header = ["name", "time", "mark", "coment", "quote", ]
+    header = ["name", "year", "mark", "comment", "quote", ]
 
     font = xlwt.Font()
     font.bold = True
@@ -69,9 +72,9 @@ if __name__ == '__main__':
     for h in range(len(header)):
         sheet.write(0, h, header[h], style)
     i = 1
-    for list in list_music:
+    for item in list_movie:
         j = 0
-        for data in list:
+        for data in item:
             sheet.write(i, j, data)
             j += 1
         i += 1
