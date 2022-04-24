@@ -6,7 +6,7 @@ import time
 from tqdm import tqdm
 # 加随机ua，使用fake-useragent库，构造随机ua
 from fake_useragent import UserAgent
-
+import re
 import json
 
 list_movie = []
@@ -17,7 +17,7 @@ headers = {'User-Agent': str(UserAgent().random)}
 f = open(r"douban_movie.csv", "w+", newline='', encoding="gb18030")
 writer = csv.writer(f, dialect='excel')
 # csv文件中第一行写入标题
-writer.writerow(["name", "year", "mark", "comment", "quote"])
+writer.writerow(["name", "year", "mark", "comment", "quote", "area"])
 
 
 # 定义爬取内容的函数
@@ -29,7 +29,8 @@ def music_info(url):
     for info in infomation:
         name = info.xpath('div[2]/div[1]/a/span[1]/text()')[0].strip()
         year = int(info.xpath('div[2]/div[2]/p[1]/text()')[1].strip()[0:4])
-
+        area = re.findall(".*/(.*)/.*", info.xpath('div[2]/div[2]/p[1]/text()')[1].strip())[0].strip()
+        print(area)
         mark = float(info.xpath('div[2]/div[2]/div/span[2]/text()')[0].strip())
         comment = int(
             info.xpath('div[2]/div[2]/div/span[4]/text()')[0].strip().strip("(").strip(")").replace('人评价', '').strip())
@@ -39,8 +40,8 @@ def music_info(url):
         except:
             quote = ""
 
-        list_info = [name, year, mark, comment, quote]
-        writer.writerow([name, year, mark, comment, quote])
+        list_info = [name, year, mark, comment, quote, area]
+        writer.writerow([name, year, mark, comment, quote, area])
         list_movie.append(list_info)
 
     # 防止请求频繁，故睡眠1秒
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     # 关闭csv文件
     f.close()
     # 爬取的内容保存在xls文件中
-    header = ["name", "year", "mark", "comment", "quote", ]
+    header = ["name", "year", "mark", "comment", "quote", "area"]
 
     # 设置列头加粗
     font = xlwt.Font()
@@ -88,6 +89,7 @@ if __name__ == '__main__':
     sheet.col(2).width = 256 * 10
     sheet.col(3).width = 256 * 15
     sheet.col(4).width = 256 * 60
+    sheet.col(5).width = 256 * 20
 
     # 保存文件
     book.save('douban_movie.xls')

@@ -11,6 +11,7 @@
 
 <div id="app">
     <div id="main" style="width: 600px;height:400px;"></div>
+    <div id="main2" style="width: 600px;height:400px;"></div>
 </div>
 <script type="text/javascript">
     var app = new Vue({
@@ -18,25 +19,40 @@
         data: {
             movie_data: [],
             ten_time_data: [],
+            ten_area_data: [],
             time: '123',
         },
         methods: {
-            loadChart(){
+            loadChart() {
                 // 基于准备好的dom，初始化echarts实例
                 let myChart = echarts.init(document.getElementById('main'));
-                let chart_key=this.ten_time_data.map((item)=>{
+                let chart_key = this.ten_time_data.map((item) => {
                     return item.key
                 })
-                let chart_value=this.ten_time_data.map((item)=>{
+                let chart_value = this.ten_time_data.map((item) => {
                     return item.value
                 })
                 // 指定图表的配置项和数据
                 let option = {
                     xAxis: {
+                        name: "年份",
                         type: 'category',
                         data: chart_key
                     },
+                    title: {
+                        text: '豆瓣电影250排名年份分布',
+                        left: 'center'
+                    },
+
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            mark: {show: true},
+                            saveAsImage: {show: true},
+                        }
+                    },
                     yAxis: {
+                        name: "数量/部",
                         type: 'value'
                     },
                     series: [
@@ -50,28 +66,126 @@
                 myChart.setOption(option);
             },
 
+            loadChart2() {
+                // 基于准备好的dom，初始化echarts实例
+                let myChart = echarts.init(document.getElementById('main2'));
+                let option = {
+                    title: {
+                        text: '豆瓣电影250排名地区分布',
+                        left: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            mark: {show: true},
+                            saveAsImage: {show: true},
+                        }
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        formatter: function (name) {
+                            let data = option.series[0].data
+                            // console.log(data, 'data')
+                            let total = 0
+                            let tarValue
+                            for (let i = 0; i < data.length; i++) {
+                                total += data[i].value
+                                if (data[i].name === name) {
+                                    tarValue = data[i].value
+                                }
+                            }
+                            let v = tarValue
+                            let p = Math.round((tarValue / total) * 100) //占比
+                            return `${name} ${v}(${p}%)`
+                        },
+                    },
+
+                    series: [
+                        {
+                            name: 'Access From',
+                            type: 'pie',
+                            radius: '50%',
+                            data: this.ten_area_data,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                },
+                            },
+                        }
+                    ]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            },
+
             filterData() {
                 let map = new Map();
-                let tempList = [];
+                let areaMap = new Map();
+                let areaList = [];
                 for (let item of this.movie_data) {
+                    /**
+                     * 获取年份
+                     */
                     if (map.get(item.year)) {
                         map.set(item.year, map.get(item.year) + 1)
                     } else {
                         map.set(item.year, 1)
                     }
+
+                    /**
+                     * 获取地区
+                     */
+                    for (let areaItem of item.area.split(" ")) {
+                        areaList.push(areaItem)
+                    }
                 }
-                for (let item of map) {
-                    tempList.push({
+
+                for (let item of areaList) {
+                    if (areaMap.get(item)) {
+                        areaMap.set(item, areaMap.get(item) + 1)
+                    } else {
+                        areaMap.set(item, 1)
+                    }
+                }
+
+                this.ten_time_data = this.sortMap_to_List(map)
+                this.ten_area_data = this.sortMap_to_List2(areaMap)
+                this.loadChart()
+                this.loadChart2()
+
+            },
+
+            sortMap_to_List(sort_map) {
+                let sort_list = []
+                for (let item of sort_map) {
+                    sort_list.push({
                         key: item[0],
                         value: item[1],
                     })
                 }
-                tempList = tempList.sort((a, b) => {
+                sort_list = sort_list.sort((a, b) => {
                     return b.value - a.value
                 })
-                this.ten_time_data = tempList.slice(0, 10)
-                this.loadChart()
-
+                return sort_list.slice(0, 10)
+            },
+            sortMap_to_List2(sort_map) {
+                let sort_list = []
+                for (let item of sort_map) {
+                    sort_list.push({
+                        name: item[0],
+                        value: item[1],
+                    })
+                }
+                sort_list = sort_list.sort((a, b) => {
+                    return b.value - a.value
+                })
+                return sort_list.slice(0, 10)
             },
 
             getMovieData() {
@@ -94,7 +208,6 @@
         }
 
     })
-
 
 
 </script>
