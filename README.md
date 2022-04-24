@@ -3,6 +3,8 @@
 ```
 pyinstaller --console --onefile 文件名(不可有中文路径和空格)
 ```
+添加数据可视化demo图片  
+![image](https://raw.githubusercontent.com/Willmind/douban-movie-250/master/demo.png)
 
 ### 4.22
 webstorm 自带local history,切换分支忘记提交代码也可以代码历史记录回溯  
