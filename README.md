@@ -1,3 +1,9 @@
+### 4.24
+更新打包exe/macos-app文件  
+```
+pyinstaller --console --onefile 文件名(不可有中文路径和空格)
+```
+
 ### 4.22
 webstorm 自带local history,切换分支忘记提交代码也可以代码历史记录回溯  
 添加随机ua，使用fake-useragent库，构造随机ua   
