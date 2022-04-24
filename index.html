@@ -12,6 +12,7 @@
 <div id="app">
     <div id="main" style="width: 600px;height:400px;"></div>
     <div id="main2" style="width: 600px;height:400px;"></div>
+    <div id="main3" style="width: 600px;height:400px;"></div>
 </div>
 <script type="text/javascript">
     var app = new Vue({
@@ -20,6 +21,7 @@
             movie_data: [],
             ten_time_data: [],
             ten_area_data: [],
+            ten_type_data: [],
             time: '123',
         },
         methods: {
@@ -124,10 +126,69 @@
                 myChart.setOption(option);
             },
 
+            loadChart3() {
+                // 基于准备好的dom，初始化echarts实例
+                let myChart = echarts.init(document.getElementById('main3'));
+                let option = {
+                    title: {
+                        text: '豆瓣电影250排名电影类型分布',
+                        left: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            mark: {show: true},
+                            saveAsImage: {show: true},
+                        }
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        formatter: function (name) {
+                            let data = option.series[0].data
+                            // console.log(data, 'data')
+                            let total = 0
+                            let tarValue
+                            for (let i = 0; i < data.length; i++) {
+                                total += data[i].value
+                                if (data[i].name === name) {
+                                    tarValue = data[i].value
+                                }
+                            }
+                            let v = tarValue
+                            let p = Math.round((tarValue / total) * 100) //占比
+                            return `${name} ${v}(${p}%)`
+                        },
+                    },
+
+                    series: [
+                        {
+                            name: 'Access From',
+                            type: 'pie',
+                            radius: '50%',
+                            data: this.ten_type_data,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                },
+                            },
+                        }
+                    ]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            },
+
+
             filterData() {
                 let map = new Map();
-                let areaMap = new Map();
                 let areaList = [];
+                let typeList = [];
                 for (let item of this.movie_data) {
                     /**
                      * 获取年份
@@ -144,21 +205,35 @@
                     for (let areaItem of item.area.split(" ")) {
                         areaList.push(areaItem)
                     }
-                }
-
-                for (let item of areaList) {
-                    if (areaMap.get(item)) {
-                        areaMap.set(item, areaMap.get(item) + 1)
-                    } else {
-                        areaMap.set(item, 1)
+                    /**
+                     * 获取类型
+                     */
+                    for (let typeItem of item.type.split(" ")) {
+                        typeList.push(typeItem)
                     }
                 }
 
+
+
                 this.ten_time_data = this.sortMap_to_List(map)
-                this.ten_area_data = this.sortMap_to_List2(areaMap)
+                this.ten_area_data = this.sortMap_to_List2(this.getMap(areaList))
+                this.ten_type_data = this.sortMap_to_List2(this.getMap(typeList))
                 this.loadChart()
                 this.loadChart2()
+                this.loadChart3()
 
+            },
+
+            getMap(list) {
+                let map = new Map();
+                for (let item of list) {
+                    if (map.get(item)) {
+                        map.set(item, map.get(item) + 1)
+                    } else {
+                        map.set(item, 1)
+                    }
+                }
+                return map
             },
 
             sortMap_to_List(sort_map) {
