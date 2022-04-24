@@ -4,6 +4,7 @@
 pyinstaller --console --onefile 文件名(不可有中文路径和空格)
 ```
 添加数据可视化demo图片  
+
 ![image](https://raw.githubusercontent.com/Willmind/douban-movie-250/master/demo.png)
 
 ### 4.22
