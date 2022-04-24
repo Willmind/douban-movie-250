@@ -3,6 +3,9 @@
 ```
 pyinstaller --console --onefile 文件名(不可有中文路径和空格)
 ```
+添加数据可视化demo图片  
+
+![image](https://raw.githubusercontent.com/Willmind/douban-movie-250/master/demo.png)
 
 ### 4.22
 webstorm 自带local history,切换分支忘记提交代码也可以代码历史记录回溯  
@@ -33,15 +36,16 @@ webstorm 自带local history,切换分支忘记提交代码也可以代码历史
 爬虫过程等待时间较长，且过程中并未知道具体数据  
 
 #### 解决方案：   
-搭建并使用ip数据流量池，或者通过asleep降低请求频率  
-添加进度条  
+- [ ] 搭建并使用ip数据流量池  
+- [x] 通过asleep降低请求频率  
+- [x] 添加进度条  
 
 #### 后续研究：  
-如何打包生成exe文件  
-把csv格式转成json数据，并增加数据分析  
-添加数据可视化  
-Python项目依赖环境怎么做成一键配置  
-后续可扩展至其他网站的数据爬取  
+- [x] 如何打包生成exe文件  
+- [x] 把csv格式转成json数据，并增加数据分析  
+- [x] 添加数据可视化  
+- [x] Python项目依赖环境怎么做成一键配置  
+- [ ] 后续可扩展至其他网站的数据爬取  
 
 #### 学习要点：  
 新版pycharm内置虚拟机解释器，可无需安装python  
