@@ -8,6 +8,9 @@ from tqdm import tqdm
 from fake_useragent import UserAgent
 import re
 import json
+from datamanage import DataManager
+
+db = DataManager()
 
 list_movie = []
 # 请求头
@@ -43,8 +46,9 @@ def music_info(url):
         list_info = [name, year, mark, comment, quote, area, movie_type]
         writer.writerow([name, year, mark, comment, quote, area, movie_type])
         list_movie.append(list_info)
-
-    # 防止请求频繁，故睡眠1秒
+        db_data = (name, mark, comment, year, movie_type, quote, area)
+        db.save_data(db_data)
+        # 防止请求频繁，故睡眠1秒
     time.sleep(1)
 
 
